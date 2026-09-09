@@ -6,6 +6,10 @@ const deviceId = "FWD899";
 const chargingButton = document.getElementById("batteryToggleButton");
 const chargingStatusLabel = document.getElementById("chargingStatusLabel");
 const batteryLevelLabel = document.getElementById("batteryLevelLabel");
+const scheduleHourInput = document.getElementById("scheduleHourInput");
+const scheduleMinuteInput = document.getElementById("scheduleMinuteInput");
+const saveScheduleButton = document.getElementById("saveScheduleButton");
+const scheduleStatusLabel = document.getElementById("scheduleStatusLabel");
 
 
 let isCharging = false;
@@ -14,6 +18,7 @@ let isCharging = false;
 fetchInitialStatus();
 getCarChargingStatus(deviceId);
 getCarBatteryLevel(deviceId);
+populateTimeDropdowns();
 
 setInterval(() => {
     getCarChargingStatus(deviceId);
@@ -42,6 +47,41 @@ function updateButtonUI() {
         chargingButton.textContent = 'Start Charging';
     }
 }
+saveScheduleButton.addEventListener("click", async () => {
+    // Combine the values from both dropdowns into "HH:mm" format
+    const scheduleTime = `${scheduleHourInput.value}:${scheduleMinuteInput.value}`;
+
+    try {
+        saveScheduleButton.disabled = true;
+        saveScheduleButton.textContent = "Saving...";
+
+        const response = await fetch(`${baseUrl}/api/car/${deviceId}/schedule`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                scheduleTime: scheduleTime
+            })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+            scheduleStatusLabel.textContent = `Schedule saved for ${scheduleTime}!`;
+            scheduleStatusLabel.style.color = "green";
+        } else {
+            throw new Error(result.error || "Failed to save schedule");
+        }
+    } catch (error) {
+        console.error("Error setting schedule:", error);
+        scheduleStatusLabel.textContent = "Error saving schedule.";
+        scheduleStatusLabel.style.color = "red";
+    } finally {
+        saveScheduleButton.disabled = false;
+        saveScheduleButton.textContent = "Save Schedule";
+    }
+});
 
 chargingButton.addEventListener('click', async () => {
     const targetState = !isCharging;
@@ -122,5 +162,23 @@ async function getCarBatteryLevel(id) {
         console.error("Failed to fetch battery level:", error);
         batteryLevelLabel.textContent = "Error";
         return null;
+    }}
+    function populateTimeDropdowns() {
+    
+    for (let i = 0; i < 24; i++) {
+        const hourStr = String(i).padStart(2, '0');
+        const option = document.createElement('option');
+        option.value = hourStr;
+        option.textContent = hourStr;
+        scheduleHourInput.appendChild(option);
+    }
+
+    
+    for (let i = 0; i < 60; i += 5) {
+        const minStr = String(i).padStart(2, '0');
+        const option = document.createElement('option');
+        option.value = minStr;
+        option.textContent = minStr;
+        scheduleMinuteInput.appendChild(option);
     }
 }

@@ -23,5 +23,19 @@
     <button id="batteryToggleButton">Charging Button</button>
 </div>
 
+<div class="schedule-card">
+    <h3>Battery Charging Schedule</h3>
+    
+    <label>Target Time (24h):</label>
+    <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 10px;">
+        <select id="scheduleHourInput"></select>
+        <span>:</span>
+        <select id="scheduleMinuteInput"></select>
+    </div>
+
+    <button id="saveScheduleButton">Save Schedule</button>
+    <span id="scheduleStatusLabel"></span>
+</div>
+
 </body>
 </html>
