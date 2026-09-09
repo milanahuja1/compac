@@ -68,7 +68,7 @@ _ = Task.Run(async () =>
     
     while (true)
     {
-        // Print a clean prompt symbol
+        
         Console.Write("> ");
         string input = Console.ReadLine()?.Trim().ToLower();
 
@@ -138,4 +138,5 @@ private static async Task<MethodResponse> HandleStopCharging(MethodRequest metho
     byte[] responseBytes = Encoding.UTF8.GetBytes("{\"status\": \"success\"}");
     return new MethodResponse(responseBytes, 200);
 }
+
 }

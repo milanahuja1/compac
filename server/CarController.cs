@@ -78,4 +78,48 @@ public static class CarController
         return new ObjectResult(new { error = "Failed to communicate with IoT Hub", details = ex.Message }) { StatusCode = 500 };
       }
     }
+
+    [Function("ToggleCharging")]
+    public static async Task<IActionResult> ToggleCharging(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "car/{deviceId}/toggleCharging/{isCharging:bool}")] HttpRequest req, 
+        string deviceId, 
+        bool isCharging)
+    {
+        try
+        {
+            // Select the Direct Method name based on the boolean passed in the URL
+            string methodName = isCharging ? "StartCharging" : "StopCharging";
+
+            var methodInvocation = new CloudToDeviceMethod(methodName)
+            {
+                ResponseTimeout = TimeSpan.FromSeconds(30)
+            };
+
+    
+            var response = await serviceClient.InvokeDeviceMethodAsync(deviceId, methodInvocation);
+
+            if (response.Status == 200)
+            {
+                return new OkObjectResult(new 
+                { 
+                    success = true, 
+                    chargingStatus = isCharging,
+                    deviceResponse = response.GetPayloadAsJson() 
+                });
+            }
+
+            return new ObjectResult(new 
+            { 
+                error = "Device returned an unsuccessful status code", 
+                statusCode = response.Status 
+            }) { StatusCode = response.Status };
+        }
+        catch (Exception ex)
+        {
+            return new ObjectResult(new { error = "Failed to communicate with IoT Hub", details = ex.Message }) 
+            { 
+                StatusCode = 500 
+            };
+        }
+    }
   }
