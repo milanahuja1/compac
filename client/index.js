@@ -48,7 +48,7 @@ function updateButtonUI() {
     }
 }
 saveScheduleButton.addEventListener("click", async () => {
-    // Combine the values from both dropdowns into "HH:mm" format
+    // cmbine the values  dropdowns into time format
     const scheduleTime = `${scheduleHourInput.value}:${scheduleMinuteInput.value}`;
 
     try {
@@ -56,7 +56,7 @@ saveScheduleButton.addEventListener("click", async () => {
         saveScheduleButton.textContent = "Saving...";
 
         const response = await fetch(`${baseUrl}/api/car/${deviceId}/schedule`, {
-            method: 'POST',
+            method: 'PATCH', 
             headers: {
                 'Content-Type': 'application/json'
             },
