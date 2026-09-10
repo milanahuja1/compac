@@ -122,4 +122,60 @@ public static class CarController
             };
         }
     }
+
+    [Function("SetChargingSchedule")]
+    public static async Task<IActionResult> SetChargingSchedule(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "car/{deviceId}/schedule")] HttpRequest req, 
+        string deviceId)
+  {
+    try
+    {
+        string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+
+        var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var scheduleData = System.Text.Json.JsonSerializer.Deserialize<SchedulePayload>(requestBody, options);
+
+        if (scheduleData == null)
+        {
+            return new BadRequestObjectResult(new { error = "Invalid request body" });
+        }
+
+        var methodInvocation = new CloudToDeviceMethod("SetSchedule")
+        {
+            ResponseTimeout = TimeSpan.FromSeconds(30)
+        };
+
+        methodInvocation.SetPayloadJson(System.Text.Json.JsonSerializer.Serialize(scheduleData));
+
+        var response = await serviceClient.InvokeDeviceMethodAsync(deviceId, methodInvocation);
+
+        if (response.Status == 200)
+        {
+            return new OkObjectResult(new 
+            { 
+                success = true, 
+                deviceResponse = response.GetPayloadAsJson() 
+            });
+        }
+
+        return new ObjectResult(new 
+        { 
+            error = "Device returned an unsuccessful status code", 
+            statusCode = response.Status 
+        }) { StatusCode = response.Status };
+    }
+    catch (Exception ex)
+    {
+        return new ObjectResult(new { error = "Failed to communicate with IoT Hub", details = ex.Message }) 
+        { 
+            StatusCode = 500 
+        };
+    }
   }
+  }
+
+
+public class SchedulePayload
+{
+    public string? ScheduleTime { get; set; }
+}

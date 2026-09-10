@@ -25,6 +25,7 @@ class Program
         
         await deviceClient.SetMethodHandlerAsync("StartCharging", HandleStartCharging, null);
         await deviceClient.SetMethodHandlerAsync("StopCharging", HandleStopCharging, null);
+        await deviceClient.SetMethodHandlerAsync("SetSchedule", HandleSetSchedule, null);
 
         _ = Task.Run(async () =>
 {
