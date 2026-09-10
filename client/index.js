@@ -19,6 +19,7 @@ fetchInitialStatus();
 getCarChargingStatus(deviceId);
 getCarBatteryLevel(deviceId);
 populateTimeDropdowns();
+getCarChargingSchedule(deviceId);
 
 setInterval(() => {
     getCarChargingStatus(deviceId);
@@ -180,5 +181,48 @@ async function getCarBatteryLevel(id) {
         option.value = minStr;
         option.textContent = minStr;
         scheduleMinuteInput.appendChild(option);
+    }}
+
+
+    async function getCarChargingSchedule(id) {
+    const apiUrl = `${baseUrl}/api/car/${id}/schedule`;
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Server returned status ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        
+        if (data.scheduleTime) {
+            // 
+            const parts = data.scheduleTime.split(':');
+            if (parts.length >= 2) {
+                scheduleHourInput.value = parts[0];
+                scheduleMinuteInput.value = parts[1];
+            }
+            scheduleStatusLabel.textContent = `Active schedule: ${parts[0]}:${parts[1]}`;
+            scheduleStatusLabel.style.color = "green";
+        } else {
+            scheduleStatusLabel.textContent = "No active schedule set.";
+            scheduleStatusLabel.style.color = "gray";
+        }
+        
+        return data.scheduleTime;
+
+    } catch (error) {
+        console.error("Failed to fetch schedule:", error);
+        scheduleStatusLabel.textContent = "Error loading schedule";
+        scheduleStatusLabel.style.color = "red";
+        return null;
     }
 }
+
