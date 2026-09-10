@@ -122,6 +122,32 @@ public static class CarController
             };
         }
     }
+    [Function("GetChargingSchedule")]
+    public static async Task<IActionResult> GetChargingSchedule(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "car/{deviceId}/schedule")] HttpRequest req, 
+        string deviceId)
+    {
+        try
+        {
+            var twin = await registryManager.GetTwinAsync(deviceId);
+            if (twin == null)
+            {
+                return new NotFoundObjectResult(new { error = "Car not found" });
+            }
+
+            string scheduleTime = null;
+            if (twin.Properties.Reported.Contains("scheduleTime"))
+            {
+                scheduleTime = twin.Properties.Reported["scheduleTime"];
+            }
+
+            return new OkObjectResult(new { scheduleTime = scheduleTime });
+        }
+        catch (Exception ex)
+        {
+            return new BadRequestObjectResult(new { error = "Failed to communicate with IoT Hub", details = ex.Message });
+        }
+    }
 
     [Function("SetChargingSchedule")]
     public static async Task<IActionResult> SetChargingSchedule(

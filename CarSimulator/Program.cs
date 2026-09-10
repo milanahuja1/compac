@@ -146,6 +146,7 @@ private static async Task<MethodResponse> HandleStopCharging(MethodRequest metho
     byte[] responseBytes = Encoding.UTF8.GetBytes("{\"status\": \"success\"}");
     return new MethodResponse(responseBytes, 200);
 }
+
 private static async Task<MethodResponse> HandleSetSchedule(MethodRequest methodRequest, object userContext)
 {
     try
@@ -167,6 +168,10 @@ private static async Task<MethodResponse> HandleSetSchedule(MethodRequest method
             car.SetScheduledStartTime(scheduleTime);
             Console.WriteLine($"[Direct Method] Schedule successfully set to: {scheduleTime}");
         }
+        // updating the twin with the new schedule time
+        var reportedProperties = new TwinCollection();
+        reportedProperties["scheduleTime"] = data?.ScheduleTime;
+        await deviceClient.UpdateReportedPropertiesAsync(reportedProperties);
 
         byte[] responseBytes = Encoding.UTF8.GetBytes("{\"status\": \"success\"}");
         return new MethodResponse(responseBytes, 200);
