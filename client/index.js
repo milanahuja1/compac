@@ -1,5 +1,5 @@
-//const baseUrl = "https://carapi-bubsbkembycqg9ed.australiaeast-01.azurewebsites.net";
-const baseUrl = "http://localhost:7071";
+const baseUrl = "https://carapi-bubsbkembycqg9ed.australiaeast-01.azurewebsites.net";
+//const baseUrl = "http://localhost:7071";
 const deviceId = "FWD899";
 
 // DOM Elements

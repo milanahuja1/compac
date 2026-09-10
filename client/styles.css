@@ -1,6 +1,159 @@
-.topContainer {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+/* Global Reset & Theme */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
 
+body {
+    background-color: #0f172a; /* Deep slate dark mode background */
+    color: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Page Title (handling the h1 gracefully) */
+h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    letter-spacing: -0.025em;
+    color: #38bdf8; /* Electric blue accent */
+    text-align: center;
+}
+
+/* Status Containers */
+.topContainer {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 16px 24px;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.topContainer h2 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #94a3b8;
+}
+
+.topContainer h2:last-child {
+    font-weight: 600;
+    color: #f8fafc;
+}
+
+/* Main Action Button Container */
+.bottomContainer {
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 16px;
+}
+
+/* Buttons */
+button {
+    width: 100%;
+    background-color: #0284c7;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+}
+
+button:hover {
+    background-color: #0ea5e9;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+button:disabled {
+    background-color: #475569;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Schedule Card */
+.schedule-card {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 24px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.schedule-card h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #f8fafc;
+}
+
+.schedule-card label {
+    font-size: 0.875rem;
+    color: #94a3b8;
+    display: block;
+    margin-bottom: 8px;
+}
+
+/* Time Dropdowns Styling */
+select {
+    background-color: #0f172a;
+    color: #f8fafc;
+    border: 1px solid #475569;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 1rem;
+    flex: 1;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+select:focus {
+    border-color: #38bdf8;
+}
+
+.schedule-card span {
+    color: #94a3b8;
+    font-weight: bold;
+}
+
+/* Save Schedule Button override for consistency */
+#saveScheduleButton {
+    background-color: #059669; /* EV Green accent */
+    margin-top: 4px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+}
+
+#saveScheduleButton:hover {
+    background-color: #10b981;
+}
+
+/* Schedule Status Feedback Text */
+#scheduleStatusLabel {
+    display: block;
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-top: 8px;
 }
