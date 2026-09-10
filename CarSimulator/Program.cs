@@ -3,6 +3,7 @@ using Microsoft.Azure.Devices.Client;
 using System.Text;
 using Microsoft.Azure.Devices.Shared;
 using Microsoft.Extensions.Configuration;
+using System.Text.Json;
 class Program
 {
   private static Car car;
@@ -31,6 +32,12 @@ class Program
     {
         try
         {
+              if(car.GetScheduledStartTime() != null && TimeOnly.FromDateTime(DateTime.Now) >= car.GetScheduledStartTime())
+      {
+        car.SetScheduledStartTime(null); //reset the scheduled time after starting charging
+        await SetAndSyncChargingStateAsync(true);
+        Console.WriteLine($"[Scheduled] Started charging at {DateTime.Now}");
+      }
           
                 if (car.GetIsCharging() && car.GetBatteryLevel() < 100)
                 {
@@ -138,5 +145,44 @@ private static async Task<MethodResponse> HandleStopCharging(MethodRequest metho
     byte[] responseBytes = Encoding.UTF8.GetBytes("{\"status\": \"success\"}");
     return new MethodResponse(responseBytes, 200);
 }
+private static async Task<MethodResponse> HandleSetSchedule(MethodRequest methodRequest, object userContext)
+{
+    try
+    {
+      
+        string payload = methodRequest.DataAsJson;
+        var data = JsonSerializer.Deserialize<SchedulePayload>(payload, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+        // check if null
+        if (string.IsNullOrEmpty(data?.ScheduleTime))
+        {
+            car.SetScheduledStartTime(null); 
+            Console.WriteLine("[Direct Method] Schedule cleared.");
+        }
+        else
+        {
+            // otherwise we parse the time and set it to car
+            TimeOnly scheduleTime = TimeOnly.Parse(data.ScheduleTime);
+            car.SetScheduledStartTime(scheduleTime);
+            Console.WriteLine($"[Direct Method] Schedule successfully set to: {scheduleTime}");
+        }
+
+        byte[] responseBytes = Encoding.UTF8.GetBytes("{\"status\": \"success\"}");
+        return new MethodResponse(responseBytes, 200);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[Error] Failed to handle schedule method: {ex.Message}");
+        byte[] errorBytes = Encoding.UTF8.GetBytes($"{{\"error\": \"{ex.Message}\"}}");
+        return new MethodResponse(errorBytes, 500);
+    }
+}
+
+// for deserializing the schedule payload
+public class SchedulePayload
+{
+    public string? ScheduleTime { get; set; }
+}
+
 
 }

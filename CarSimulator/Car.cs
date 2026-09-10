@@ -7,6 +7,7 @@ class Car
     private string rego;
     private int batteryLevel;
     private bool isCharging;
+    private TimeOnly? scheduledStartTime;
 
     public Car(string rego)
     {
@@ -81,6 +82,22 @@ class Car
         lock (_lock)
         {
             this.isCharging = status;
+        }
+    }
+
+    public void SetScheduledStartTime(TimeOnly? time)
+    {
+        lock (_lock)
+        {
+            this.scheduledStartTime = time;
+        }
+    }
+
+    public TimeOnly? GetScheduledStartTime()
+    {
+        lock (_lock)
+        {
+            return scheduledStartTime;
         }
     }
 }
