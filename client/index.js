@@ -10,6 +10,7 @@ const scheduleHourInput = document.getElementById("scheduleHourInput");
 const scheduleMinuteInput = document.getElementById("scheduleMinuteInput");
 const saveScheduleButton = document.getElementById("saveScheduleButton");
 const scheduleStatusLabel = document.getElementById("scheduleStatusLabel");
+const deleteScheduleButton = document.getElementById("deleteScheduleButton");
 
 
 let isCharging = false;
@@ -21,10 +22,45 @@ getCarBatteryLevel(deviceId);
 populateTimeDropdowns();
 getCarChargingSchedule(deviceId);
 
+deleteScheduleButton.addEventListener("click", async () => {
+    try {
+        deleteScheduleButton.disabled = true;
+        deleteScheduleButton.textContent = "Clearing...";
+
+        const response = await fetch(`${baseUrl}/api/car/${deviceId}/schedule`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                scheduleTime: null
+            })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+            scheduleHourInput.value = "00";
+            scheduleMinuteInput.value = "00";
+            scheduleStatusLabel.textContent = "Schedule cleared!";
+            scheduleStatusLabel.style.color = "gray";
+
+        } else {
+            throw new Error(result.error || "Failed to clear schedule");
+        }
+    } catch (error) {
+        console.error("Error clearing schedule:", error);
+        scheduleStatusLabel.textContent = "Error clearing schedule.";
+        scheduleStatusLabel.style.color = "red";
+    } finally {
+        deleteScheduleButton.disabled = false;
+        deleteScheduleButton.textContent = "Clear Schedule";
+    }
+});
 setInterval(() => {
     getCarChargingStatus(deviceId);
     getCarBatteryLevel(deviceId);
-}, 3000);
+  }, 3000);
 
 async function fetchInitialStatus() {
     try {
@@ -203,7 +239,7 @@ async function getCarBatteryLevel(id) {
         
         
         if (data.scheduleTime) {
-            // 
+          
             const parts = data.scheduleTime.split(':');
             if (parts.length >= 2) {
                 scheduleHourInput.value = parts[0];
